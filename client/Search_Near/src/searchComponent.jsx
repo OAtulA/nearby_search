@@ -74,12 +74,37 @@ const SearchComponent = () => {
 
   // Function to handle search submission
   const handleSearchSubmit = () => {
+    let latitude, longitude;
     // Implement search functionality here, using searchTerm, selectedCategory, and searchRadius
     console.log('Search submitted:', searchTerm, selectedCategory, searchRadius);
     // This will be sent to backend    
 
     //send these to the backend at localhost:3001/nearby-search
     //  let { searchTerm, latitude, longitude, radius, category } = req.body;
+
+    getLocation()
+  .then(position => {
+     latitude = position.coords.latitude;
+    longitude = position.coords.longitude;
+    
+    // Use latitude and longitude here
+    console.log("Latitude:", latitude);
+    console.log("Longitude:", longitude);
+
+    // You can return the latitude and longitude if needed
+    return { latitude, longitude };
+  })
+  .catch(error => {
+    try{
+
+    
+    let location=getIPLocation();
+    latitude = location.latitude;
+    longitude = location.longitude;
+  }catch(error){
+    console.log(error.message);
+  }
+  });
 
   };
 
