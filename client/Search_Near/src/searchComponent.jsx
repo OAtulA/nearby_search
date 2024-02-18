@@ -35,7 +35,7 @@ function getIPLocation() {
       return;
     });
 
-    return obj;
+  return obj;
 }
 
 function getLocation() {
@@ -73,7 +73,7 @@ const SearchComponent = () => {
   };
 
   // Function to handle search submission
-  const handleSearchSubmit = () => {
+  const handleSearchSubmit = async () => {
     let latitude, longitude;
     // Implement search functionality here, using searchTerm, selectedCategory, and searchRadius
     console.log('Search submitted:', searchTerm, selectedCategory, searchRadius);
@@ -82,30 +82,45 @@ const SearchComponent = () => {
     //send these to the backend at localhost:3001/nearby-search
     //  let { searchTerm, latitude, longitude, radius, category } = req.body;
 
-    getLocation()
-  .then(position => {
-     latitude = position.coords.latitude;
-    longitude = position.coords.longitude;
+    await getLocation()
+      .then(position => {
+        latitude = position.coords.latitude;
+        longitude = position.coords.longitude;
+
+        // Use latitude and longitude here
+        console.log("Latitude:", latitude);
+        console.log("Longitude:", longitude);
+
+        // You can return the latitude and longitude if needed
+        return { latitude, longitude };
+      })
+      .catch(error => {
+        try {
+          let location = getIPLocation();
+          latitude = location.latitude;
+          longitude = location.longitude;
+        } catch (error) {
+          console.log(error.message);
+        }
+      });
     
-    // Use latitude and longitude here
-    console.log("Latitude:", latitude);
-    console.log("Longitude:", longitude);
-
-    // You can return the latitude and longitude if needed
-    return { latitude, longitude };
-  })
-  .catch(error => {
-    try{
-
-    
-    let location=getIPLocation();
-    latitude = location.latitude;
-    longitude = location.longitude;
-  }catch(error){
-    console.log(error.message);
-  }
-  });
-
+    //send these to the backend at localhost:3001/nearby-search
+    let opts={
+      body:{
+        searchTerm: searchTerm,
+        latitude: latitude,
+        longitude: longitude,
+        radius: searchRadius,
+        category: selectedCategory
+      }
+    }
+    let places = [];
+    await axios.post('http://localhost:3001/nearby-search', opts)
+      .then(res => {  
+        places = res.data;
+        console.log(places);
+        // return places;
+      })
   };
 
   return (
