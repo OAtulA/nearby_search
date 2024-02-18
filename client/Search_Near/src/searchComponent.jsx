@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import axios from 'axios';
 
 export const Categories = ({ categories, selectedCategory, handleCategorySelect }) => {
   return (
@@ -7,9 +8,8 @@ export const Categories = ({ categories, selectedCategory, handleCategorySelect 
       {categories.map((category, index) => (
         <button
           key={index}
-          className={`bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-2 px-4 rounded ${
-            selectedCategory === category && 'bg-teal-500 text-white'
-          }`}
+          className={`bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-2 px-4 rounded ${selectedCategory === category && 'bg-teal-500 text-white'
+            }`}
           onClick={() => handleCategorySelect(category)}
         >
           {category}
@@ -19,11 +19,53 @@ export const Categories = ({ categories, selectedCategory, handleCategorySelect 
   );
 };
 
+function getIPLocation() {
+  // Make a GET request to a geolocation API or service
+  let obj;
+  fetch('https://ipapi.co/json/')
+    .then(response => response.json())
+    .then(data => {
+      const { latitude, longitude } = data;
+      obj = { latitude, longitude };
+      // Use latitude and longitude here
+      console.log("Latitude:", latitude);
+      console.log("Longitude:", longitude);
+    })
+    .catch(error => {
+      console.error('Error:', error.message);
+      return;
+    });
+
+  return obj;
+}
+
+function getLocation() {
+  return new Promise((resolve, reject) => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(resolve, reject);
+    } else {
+      reject("Geolocation is not supported by this browser.");
+    }
+  });
+}
+
+// component to list search results
+const SearchResults = ({ searchResults }) => {
+
+  return(
+    <ul>
+      {searchResults.map((result, index) => 
+      (<li key={index}><span>result</span></li>))}
+    </ul>
+  )
+}
+
 const SearchComponent = () => {
   // State variables
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
   const [searchRadius, setSearchRadius] = useState(10); // Default radius: 10km
+  const [searchResults, setSearchResults] = useState([]);
 
   const categories = ['car-repair', 'electronics-repair', 'e-waste-collection', 'old-age-home', 'specially-abled-children', 'orphanage'];
 
@@ -43,10 +85,52 @@ const SearchComponent = () => {
   };
 
   // Function to handle search submission
-  const handleSearchSubmit = () => {
+  const handleSearchSubmit = async () => {
+    let latitude, longitude;
     // Implement search functionality here, using searchTerm, selectedCategory, and searchRadius
     console.log('Search submitted:', searchTerm, selectedCategory, searchRadius);
     // This will be sent to backend    
+
+    await getLocation()
+      .then(position => {
+        latitude = position.coords.latitude;
+        longitude = position.coords.longitude;
+
+        // Use latitude and longitude here
+        console.log("Latitude:", latitude);
+        console.log("Longitude:", longitude);
+
+        // You can return the latitude and longitude if needed
+        return { latitude, longitude };
+      })
+      .catch(error => {
+        try {
+          let location = getIPLocation();
+          latitude = location.latitude;
+          longitude = location.longitude;
+        } catch (error) {
+          console.log(error.message);
+        }
+      });
+    
+    //send these to the backend at localhost:3001/nearby-search
+    let opts={
+      body:{
+        searchTerm: searchTerm,
+        latitude: latitude,
+        longitude: longitude,
+        radius: searchRadius,
+        category: selectedCategory
+      }
+    }
+    let places = [];
+    await axios.post('http://localhost:3001/api/nearby-search', opts)
+      .then(res => {  
+        places = res.data;
+        console.log(places);       
+        setSearchResults(places) 
+      })
+      .catch(error=>{console.log(error.message)})
   };
 
   return (
@@ -89,6 +173,11 @@ const SearchComponent = () => {
         />
         <span className="ml-2">{searchRadius} km</span>
       </div>
+
+      {/* Search results */}
+      <SearchResults searchResults={searchResults} />
+
+
     </div>
   );
 };
