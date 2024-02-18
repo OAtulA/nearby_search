@@ -7,9 +7,8 @@ export const Categories = ({ categories, selectedCategory, handleCategorySelect 
       {categories.map((category, index) => (
         <button
           key={index}
-          className={`bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-2 px-4 rounded ${
-            selectedCategory === category && 'bg-teal-500 text-white'
-          }`}
+          className={`bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-2 px-4 rounded ${selectedCategory === category && 'bg-teal-500 text-white'
+            }`}
           onClick={() => handleCategorySelect(category)}
         >
           {category}
@@ -18,6 +17,37 @@ export const Categories = ({ categories, selectedCategory, handleCategorySelect 
     </div>
   );
 };
+
+function getIPLocation() {
+  // Make a GET request to a geolocation API or service
+  let obj;
+  fetch('https://ipapi.co/json/')
+    .then(response => response.json())
+    .then(data => {
+      const { latitude, longitude } = data;
+      obj = { latitude, longitude };
+      // Use latitude and longitude here
+      console.log("Latitude:", latitude);
+      console.log("Longitude:", longitude);
+    })
+    .catch(error => {
+      console.error('Error:', error.message);
+      return;
+    });
+
+    return obj;
+}
+
+function getLocation() {
+  return new Promise((resolve, reject) => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(resolve, reject);
+    } else {
+      reject("Geolocation is not supported by this browser.");
+    }
+  });
+}
+
 
 const SearchComponent = () => {
   // State variables
@@ -47,6 +77,10 @@ const SearchComponent = () => {
     // Implement search functionality here, using searchTerm, selectedCategory, and searchRadius
     console.log('Search submitted:', searchTerm, selectedCategory, searchRadius);
     // This will be sent to backend    
+
+    //send these to the backend at localhost:3001/nearby-search
+    //  let { searchTerm, latitude, longitude, radius, category } = req.body;
+
   };
 
   return (
