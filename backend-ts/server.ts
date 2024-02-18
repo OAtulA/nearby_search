@@ -22,7 +22,9 @@ interface Iparams {
 
 app.post('/api/nearby-search', async (req:Request, res:Response) => {
     console.log('nearby-search hit')
+    console.log('the body is',req.body)
     try {
+        console.log('nearby-search hit starting to work')
         let { searchTerm, latitude, longitude, radius, category } = req.body;
         latitude = parseFloat(latitude);
         longitude = parseFloat(longitude);
@@ -31,7 +33,7 @@ app.post('/api/nearby-search', async (req:Request, res:Response) => {
         if (!searchTerm) {
             return res.status(400).json({ error: 'Search term is required' });
         }
-
+        console.log("fine till here")
         // Set default values for category and limit
         const params: Iparams = {
             key: TOMTOM_API_KEY,

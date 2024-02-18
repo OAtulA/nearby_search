@@ -124,7 +124,7 @@ const SearchComponent = () => {
       }
     }
     let places = [];
-    await axios.post('http://localhost:3001/nearby-search', opts)
+    await axios.post('http://localhost:3001/api/nearby-search', opts)
       .then(res => {  
         places = res.data;
         console.log(places);       
