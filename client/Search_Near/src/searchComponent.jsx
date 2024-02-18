@@ -48,12 +48,23 @@ function getLocation() {
   });
 }
 
+// component to list search results
+const SearchResults = ({ searchResults }) => {
+
+  return(
+    <ul>
+      {SearchResults.map((result, index) => 
+      (<li key={index}><span>result</span></li>))}
+    </ul>
+  )
+}
 
 const SearchComponent = () => {
   // State variables
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
   const [searchRadius, setSearchRadius] = useState(10); // Default radius: 10km
+  const [searchResults, setSearchResults] = useState([]);
 
   const categories = ['car-repair', 'electronics-repair', 'e-waste-collection', 'old-age-home', 'specially-abled-children', 'orphanage'];
 
@@ -78,9 +89,6 @@ const SearchComponent = () => {
     // Implement search functionality here, using searchTerm, selectedCategory, and searchRadius
     console.log('Search submitted:', searchTerm, selectedCategory, searchRadius);
     // This will be sent to backend    
-
-    //send these to the backend at localhost:3001/nearby-search
-    //  let { searchTerm, latitude, longitude, radius, category } = req.body;
 
     await getLocation()
       .then(position => {
@@ -118,8 +126,10 @@ const SearchComponent = () => {
     await axios.post('http://localhost:3001/nearby-search', opts)
       .then(res => {  
         places = res.data;
-        console.log(places);        
+        console.log(places);       
+        setSearchResults(places) 
       })
+      .catch(error=>{console.log(error.message)})
   };
 
   return (
@@ -162,6 +172,11 @@ const SearchComponent = () => {
         />
         <span className="ml-2">{searchRadius} km</span>
       </div>
+
+      {/* Search results */}
+      <SearchResults searchResults={searchResults} />
+
+      
     </div>
   );
 };
