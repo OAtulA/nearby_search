@@ -118,8 +118,7 @@ const SearchComponent = () => {
     await axios.post('http://localhost:3001/nearby-search', opts)
       .then(res => {  
         places = res.data;
-        console.log(places);
-        // return places;
+        console.log(places);        
       })
   };
 
