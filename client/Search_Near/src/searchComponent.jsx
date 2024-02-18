@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import axios from 'axios';
 
 export const Categories = ({ categories, selectedCategory, handleCategorySelect }) => {
   return (
@@ -53,7 +54,7 @@ const SearchResults = ({ searchResults }) => {
 
   return(
     <ul>
-      {SearchResults.map((result, index) => 
+      {searchResults.map((result, index) => 
       (<li key={index}><span>result</span></li>))}
     </ul>
   )
@@ -176,7 +177,7 @@ const SearchComponent = () => {
       {/* Search results */}
       <SearchResults searchResults={searchResults} />
 
-      
+
     </div>
   );
 };
