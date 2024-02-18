@@ -1,0 +1,19 @@
+{
+    "compilerOptions": {
+        "target": "es6",
+        "module": "commonjs",
+        "strict": true,
+        "esModuleInterop": true,
+        "outDir": "../Backend", // Output directory for compiled JS files
+        "rootDir": "."
+    },
+    "include": [
+        "*.ts",
+        "**/*.ts",
+        "**/*.test.ts"
+    ],
+    "exclude": [
+        "node_modules",
+        "**/*.spec.ts"
+    ]
+}
